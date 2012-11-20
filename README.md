@@ -146,7 +146,7 @@ your application exists already on cloudfoundry and runs the appropriate cf-push
 If additional services are required by your application you can easily configure them to be created before the cf-deploy
 task executes like this:
 
-'''
+```
 tasks.'cf-deploy'.doFirst {
     tasks['createMongoService'].execute()
     tasks['createMySqlService'].execute()
@@ -168,7 +168,7 @@ task createMySqlService(type: org.gradle.cf.AddServiceCloudFoundryTask) {
     username = 'user@domain.com'
     password = 'foobar'
 }
-'''
+```
 
 
 Future work
