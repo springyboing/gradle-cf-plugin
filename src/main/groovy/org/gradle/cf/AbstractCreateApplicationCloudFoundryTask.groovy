@@ -64,4 +64,8 @@ abstract class AbstractCreateApplicationCloudFoundryTask extends AbstractCloudFo
             throw new GradleException("You must choose memory size in this list $DEFAULT_MEMORY_SIZES")
         }
     }
+
+    List<String> getUniqueUris() {
+        return getUris().collect { it.toString() }.unique()
+    }
 }

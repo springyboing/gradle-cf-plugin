@@ -49,6 +49,7 @@ class CloudFoundryPlugin implements Plugin<Project> {
         project.task('cf-delete-env', type: DeleteEnvCloudFoundryTask)
         project.task('cf-map', type: MapCloudFoundryTask)
         project.task('cf-unmap', type: UnmapCloudFoundryTask)
+        project.task('cf-deploy', type: DeployApplicationCloudFoundryTask)
 
 
         // initiate properties

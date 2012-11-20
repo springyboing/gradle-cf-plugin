@@ -59,10 +59,10 @@ class PushApplicationCloudFoundryTask extends AbstractCreateApplicationCloudFoun
                 def staging = new Staging(getApplicationFramework()?:'standalone')
                 staging.runtime = getRuntime()
                 staging.command = getCommand()
-                client.createApplication(getApplication(), staging, getMemory(), getUris(), getServices())
+                client.createApplication(getApplication(), staging, getMemory(), getUniqueUris(), getServices())
             } else {
                 log "Creating application '${getApplication()}'"
-                client.createApplication(getApplication(), getFramework(), getMemory(), getUris(), getServices())
+                client.createApplication(getApplication(), getFramework(), getMemory(), getUniqueUris(), getServices())
             }
 
             if (getEnvers()) {
