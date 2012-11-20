@@ -22,6 +22,7 @@ The plugin adds the following tasks:
 * cf-unbind: Unbinds a service from an application
 * cf-add-user: Registers a user to the cloud
 * cf-delete-user: Unregisters the user from the cloud
+* cf-deploy: Pushes or Updates an application
 
 Configuring
 -----------
@@ -114,12 +115,12 @@ CloudFoundry has support for standalone applications. In that case, you must con
 For example:
 ```
 cloudfoundry {
-   target='http://api.vcap.me'
+   target = 'http://api.vcap.me'
    username = 'user@domain.com'
-   password='foobar'
+   password = 'foobar'
    application = 'myapp'
    framework = 'standalone'
-   applicationFramework='standalone'
+   applicationFramework = 'standalone'
    runtime = 'java'
    command = "$name/bin/$name"
    file = distZip.archivePath
@@ -127,6 +128,40 @@ cloudfoundry {
    memory = 256
 }
 ```
+
+Automated Deployment
+--------------------
+
+Regardless of whether you have a previously pushed app you can now execute 'gradle cf-deploy'.  This determines if
+your application exists already on cloudfoundry and runs the appropriate cf-push or cf-update task.
+
+If additional services are required by your application you can easily configure them to be created before the cf-deploy
+task executes like this:
+
+```
+tasks.'cf-deploy'.doFirst {
+    tasks['createMongoService'].execute()
+    tasks['createMySqlService'].execute()
+}
+
+task createMongoService(type: org.gradle.cf.AddServiceCloudFoundryTask) {
+    serviceName = 'mongo-service-1234567890'
+    vendor = 'mongodb'
+    version = '1.8'
+    tier = 'free'
+    username = 'user@domain.com'
+    password = 'foobar'
+}
+task createMySqlService(type: org.gradle.cf.AddServiceCloudFoundryTask) {
+    serviceName = 'mysql-service-1234567890'
+    vendor = 'mysql'
+    version = '5.1'
+    tier = 'free'
+    username = 'user@domain.com'
+    password = 'foobar'
+}
+```
+
 
 Future work
 -----------

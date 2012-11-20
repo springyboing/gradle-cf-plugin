@@ -69,13 +69,27 @@ class AddServiceCloudFoundryTask extends AbstractCloudFoundryTask {
             if (!name) {
                 name = "${getVendor()}-service-${UUID.randomUUID().toString()[0..7]}"
             }
-            
-            // create service
-            log "Provisioning ${getVendor()} service '$name'"
-            client.createService(new CloudService(
-                    name: name, tier: getTier(), type: config.type,
-                    vendor: config.vendor, version: ver
-            ))
+
+            // Check if this service has already been created....  Can you have the same name but different types???
+            List<CloudService> cloudServices = client.getServices()
+            def cloudService = cloudServices.find {
+                it.name == name && it.type == config.type && it.vendor == config.vendor
+            }
+
+            if (cloudService) {
+                log "Service ${name} already exists for a ${config.vendor} service"
+                log "\tName: ${cloudService.name}"
+                log "\tVendor: ${cloudService.vendor}"
+                log "\tType: ${cloudService.type}"
+                log "\tVersion: ${cloudService.version}"
+            } else {
+                // create service
+                log "Provisioning ${getVendor()} service '$name'"
+                client.createService(new CloudService(
+                        name: name, tier: getTier(), type: config.type,
+                        vendor: config.vendor, version: ver
+                ))
+            }
             
             // bind if necessary
             if (isBind()) {

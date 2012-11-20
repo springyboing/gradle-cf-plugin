@@ -44,6 +44,7 @@ class CloudFoundryPlugin implements Plugin<Project> {
         project.task('cf-update', type: UpdateApplicationCloudFoundryTask)
         project.task('cf-add-user', type: AddUserCloudFoundryTask)
         project.task('cf-delete-user', type: DeleteUserCloudFoundryTask)
+        project.task('cf-deploy', type: DeployApplicationCloudFoundryTask)
 
         // initiate properties
         project.tasks.withType(AbstractCloudFoundryTask).each { task ->

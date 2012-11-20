@@ -59,7 +59,7 @@ abstract class AbstractCloudFoundryTask extends DefaultTask {
                 throw e
             }
         } catch (ResourceAccessException e) {
-            throw new GradleException("Cannot access hotst at '${getTarget()}'.", e)
+            throw new GradleException("Cannot access host at '${getTarget()}'.", e)
         } finally {
             client = localClient
         }

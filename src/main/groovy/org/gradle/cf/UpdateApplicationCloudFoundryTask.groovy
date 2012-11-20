@@ -63,17 +63,48 @@ class UpdateApplicationCloudFoundryTask extends AbstractCreateApplicationCloudFo
                 log "Updating number of instances to ${getInstances()}"
                 client.updateApplicationInstances(getApplication(), getInstances())
             }
-            
-            if (getUris() as Set != app.getUris() as Set) {
-                client.updateApplicationUris(application, uris)
+
+            if (getUniqueUris() as Set != app.getUris() as Set) {
+                log "Updating URI mappings ${getUniqueUris()}"
+                client.updateApplicationUris(application, getUniqueUris())
             }
-            
+
+            bindServices(app)
+
             if (isStartApp() && app.state == CloudApplication.AppState.STOPPED) {
                 log "Starting '${getApplication()}'"
                 client.startApplication(getApplication())
             } else if (isStartApp() && app.state != CloudApplication.AppState.UPDATING) {
                 log "Restarting '${getApplication()}"
                 client.restartApplication(getApplication())
+            }
+        }
+    }
+
+    /**
+     * Binds services if they are not already bond, and already created on the Cloud Foundry platform.
+     */
+    private void bindServices(CloudApplication app) {
+        if (getServices()) {
+            def missingServices = getServices() - app.getServices()
+            if (missingServices) {
+                log 'Services configured on remote app: ' + app.getServices().sort()
+                log 'Services required by remote app: ' + getServices().sort()
+                log 'Missing services: ' + missingServices
+
+                // Are missing services availiable on CloudFoundry?
+                def availiableServices = client.getServices().collect { it.name }
+                def servicesToBind = availableServices.intersect(missingServices)
+                log 'Services available to bind: ' + getServices().sort()
+                servicesToBind.each { String serviceToBind ->
+                    log "Binding service '$name' to '${getApplication()}'"
+                    client.bindService(getApplication(), serviceToBind)
+                }
+
+                def unCreatedServices = missingServices - servicesToBind
+                if (unCreatedServices) {
+                    log "Unable to find services: ${unCreatedServices}. Please create them and execute again."
+                }
             }
         }
     }
